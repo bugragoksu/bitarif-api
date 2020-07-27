@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'bitarif_user',
+    'recipe',
 
     'rest_framework',
 
