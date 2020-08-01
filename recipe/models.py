@@ -46,6 +46,7 @@ class Recipe(models.Model):
     time = models.CharField(max_length=30)
     serving = models.CharField(max_length=30)
     likes = models.IntegerField(default=0)
+    created_date = models.DateField(auto_now_add=True,null=True)
 
     def __str__(self):
         return self.title

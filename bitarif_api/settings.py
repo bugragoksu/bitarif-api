@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'recipe',
 
     'rest_framework',
+    'django_filters',
 
 ]
 
