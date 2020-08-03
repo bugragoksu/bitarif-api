@@ -14,3 +14,8 @@ class BitarifUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = BitarifUser
         fields = '__all__'
+
+class BitarifUserCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BitarifUser
+        fields = '__all__'
