@@ -12,6 +12,7 @@ class BitarifUser(models.Model):
     profile_pic = models.CharField(max_length=500, blank=True, null=True)
     created_date = models.DateTimeField(auto_now_add=True)
     follower = models.ManyToManyField('self', related_name='followers', symmetrical=False, blank=True)
+    is_authenticated = True
 
     def __str__(self):
         return self.email
