@@ -36,11 +36,11 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
-    user = models.OneToOneField(BitarifUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(BitarifUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=500)
     desc = models.TextField()
     category = models.ManyToManyField(Category)
-    difficulty = models.OneToOneField(Difficulty, on_delete=models.CASCADE)
+    difficulty = models.ForeignKey(Difficulty, on_delete=models.CASCADE)
     ingredients = models.ManyToManyField(Ingredient)
     image_url = models.CharField(max_length=500)
     time = models.CharField(max_length=30)
