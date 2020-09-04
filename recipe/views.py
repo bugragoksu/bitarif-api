@@ -120,3 +120,21 @@ def increase_like_count_recipe(request):
         return JsonResponse({"success": False, "message": RECIPE_NOT_FOUND})
     except:
         return JsonResponse({"success": False, "message": SOMETHING_WENT_WRONG})
+
+
+@api_view(['POST'])
+def get_liked_recipes(request):
+    try:
+        recipe_id_list = request.data.get("recipe_id_list")
+    except IndexError:
+        return JsonResponse({"success": False, "message": MISSING_PARAMS})
+    try:
+        recipe_list = []
+        for recipe_dict in recipe_id_list:
+            recipe_list.append(Recipe.objects.get(id=recipe_dict['id']))
+        serialized_obj = RecipeSerializer(recipe_list, many=True)
+        return JsonResponse({"success": True, "data": serialized_obj.data})
+    except Recipe.DoesNotExist:
+        return JsonResponse({"success": False, "message": RECIPE_NOT_FOUND})
+    except:
+        return JsonResponse({"success": False, "message": SOMETHING_WENT_WRONG})

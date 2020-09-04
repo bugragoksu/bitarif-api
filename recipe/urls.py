@@ -9,5 +9,6 @@ urlpatterns = [
     path('list/', RecipeListView.as_view(), name='Recipe List'),
     path('add/', add_recipe, name='Add Recipe'),
     path('like/', increase_like_count_recipe, name='Like Recipe'),
+    path('get-liked-recipes/', get_liked_recipes, name='Like Recipe'),
 
 ]
