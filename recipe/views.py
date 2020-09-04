@@ -4,7 +4,8 @@ from http import HTTPStatus
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 
 from const import *
 from .serializers import *
@@ -36,13 +37,15 @@ class IngredientListView(ListAPIView):
     serializer_class = IngredientSerializer
 
 
+@permission_classes([AllowAny])
 class RecipeListView(ListAPIView):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = [
         'title',
-        'category__name'
+        'category__name',
+        'user__firebase_id'
     ]
 
 
@@ -86,28 +89,34 @@ def add_recipe(request):
         return JsonResponse({"success": False, "message": INGREDIENT_NOT_FOUND_TEXT})
 
     recipe = Recipe()
-    recipe.user=user
-    recipe.difficulty=difficulty
-    recipe.desc=desc
-    recipe.image_url=image_url
-    recipe.serving=serving
-    recipe.time=time
-    recipe.title=title
+    recipe.user = user
+    recipe.difficulty = difficulty
+    recipe.desc = desc
+    recipe.image_url = image_url
+    recipe.serving = serving
+    recipe.time = time
+    recipe.title = title
     recipe.save()
     recipe.category.add(category)
     recipe.ingredients.set(ingredient_obj_list)
 
-
-    # recipe.user = user
-    # recipe.category.set(category)
-    # recipe.difficulty = difficulty
-    # recipe.title = title
-    # recipe.desc = desc
-    # recipe.image_url = image_url
-    # recipe.time = time
-    # recipe.serving = serving
-    # recipe.ingredients.set(ingredient_obj_list)
-    # recipe.save()
-
     serialized_obj = RecipeSerializer(recipe)
     return JsonResponse({"success": True, "data": serialized_obj.data})
+
+
+@api_view(['POST'])
+def increase_like_count_recipe(request):
+    try:
+        id = request.data.get('id')
+    except IndexError:
+        return JsonResponse({"success": False, "message": MISSING_PARAMS})
+
+    try:
+        recipe = Recipe.objects.get(id=id)
+        recipe.likes += 1
+        recipe.save()
+        return JsonResponse({"success": True, "message": SUCCESSFUL_TEXT})
+    except Recipe.DoesNotExist:
+        return JsonResponse({"success": False, "message": RECIPE_NOT_FOUND})
+    except:
+        return JsonResponse({"success": False, "message": SOMETHING_WENT_WRONG})

@@ -8,5 +8,6 @@ urlpatterns = [
     path('ingredient/', IngredientListView.as_view(), name='Ingredient List'),
     path('list/', RecipeListView.as_view(), name='Recipe List'),
     path('add/', add_recipe, name='Add Recipe'),
+    path('like/', increase_like_count_recipe, name='Like Recipe'),
 
 ]
