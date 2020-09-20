@@ -15,7 +15,14 @@ class BitarifUserSerializer(serializers.ModelSerializer):
         model = BitarifUser
         fields = '__all__'
 
+
 class BitarifUserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BitarifUser
         fields = '__all__'
+
+
+class BitarifUserNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BitarifUser
+        fields = ('firebase_id', 'name',)

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
 
     'bitarif_user',
     'recipe',
+    'blog',
 
     'rest_framework',
     'django_filters',
