@@ -133,8 +133,21 @@ def get_liked_recipes(request):
         for recipe_dict in json.loads(recipe_id_list):
             recipe_list.append(Recipe.objects.get(id=int(recipe_dict['id'])))
         serialized_obj = RecipeSerializer(recipe_list, many=True)
-        return JsonResponse(serialized_obj.data,safe=False)
+        return JsonResponse(serialized_obj.data, safe=False)
     except Recipe.DoesNotExist:
         return JsonResponse({"success": False, "message": RECIPE_NOT_FOUND})
     except:
         return JsonResponse({"success": False, "message": SOMETHING_WENT_WRONG})
+
+
+@api_view(['POST'])
+def get_recipes_by_user(request):
+    try:
+        firebase_id = request.data.get("firebase_id")
+        recipes = Recipe.objects.filter(user__firebase_id=firebase_id)
+        serialized_obj = RecipeSerializer(recipes, many=True)
+        return JsonResponse(serialized_obj.data,safe=False)
+    except IndexError:
+        return JsonResponse({"success": False, "message": MISSING_PARAMS})
+    except Recipe.DoesNotExist:
+        return JsonResponse({"success": False, "message": RECIPE_NOT_FOUND})
