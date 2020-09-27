@@ -1,3 +1,5 @@
+import json
+
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -36,5 +38,23 @@ def create_blog(request):
         return JsonResponse({"success": False, "message": USER_NOT_FOUND_TEXT})
     except IndexError:
         return JsonResponse({"success": False, "message": MISSING_PARAMS})
+    except:
+        return JsonResponse({"success": False, "message": SOMETHING_WENT_WRONG})
+
+
+@api_view(['POST'])
+def get_liked_blogs(request):
+    try:
+        blog_id_list = request.data.get("blog_id_list")
+    except IndexError:
+        return JsonResponse({"success": False, "message": MISSING_PARAMS})
+    try:
+        blog_list = []
+        for blog_dict in json.loads(blog_id_list):
+            blog_list.append(Blog.objects.get(id=int(blog_dict['id'])))
+        serialized_obj = BlogSerializer(blog_list, many=True)
+        return JsonResponse(serialized_obj.data,safe=False)
+    except Blog.DoesNotExist:
+        return JsonResponse({"success": False, "message": BLOG_NOT_FOUND_TEXT})
     except:
         return JsonResponse({"success": False, "message": SOMETHING_WENT_WRONG})
