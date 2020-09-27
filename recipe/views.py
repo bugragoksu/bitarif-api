@@ -130,10 +130,10 @@ def get_liked_recipes(request):
         return JsonResponse({"success": False, "message": MISSING_PARAMS})
     try:
         recipe_list = []
-        for recipe_dict in recipe_id_list:
-            recipe_list.append(Recipe.objects.get(id=recipe_dict['id']))
+        for recipe_dict in json.loads(recipe_id_list):
+            recipe_list.append(Recipe.objects.get(id=int(recipe_dict['id'])))
         serialized_obj = RecipeSerializer(recipe_list, many=True)
-        return JsonResponse({"success": True, "data": serialized_obj.data})
+        return JsonResponse(serialized_obj.data,safe=False)
     except Recipe.DoesNotExist:
         return JsonResponse({"success": False, "message": RECIPE_NOT_FOUND})
     except:

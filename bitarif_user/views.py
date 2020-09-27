@@ -5,6 +5,7 @@ from django.shortcuts import render
 from rest_framework import exceptions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
 from const import *
 from .serializers import *
@@ -18,7 +19,17 @@ from utils import helper
 class BitarifUserCreateView(CreateAPIView):
     serializer_class = BitarifUserCreateSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer=self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        data=serializer.data
+        token = helper.generate_access_token(data["firebase_id"])
+        data.update({"token":token})
+        return Response(data,status=HTTPStatus.CREATED)
 
+
+@permission_classes([AllowAny])
 class BitarifUserListView(ListAPIView):
     queryset = BitarifUser.objects.all()
     serializer_class = BitarifUserSerializer
@@ -38,8 +49,10 @@ def login_view(request):
         raise exceptions.AuthenticationFailed(AUTH_FAILED)
 
     token = helper.generate_access_token(user.firebase_id)
-
-    return JsonResponse({"success": True, "token": token})
+    serialized_obj = BitarifUserSerializer(user)
+    data=serialized_obj.data
+    data.update({'token': token})
+    return JsonResponse(data)
 
 
 @csrf_exempt

@@ -22,6 +22,8 @@ class BitarifUserCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
+
 class BitarifUserNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = BitarifUser
