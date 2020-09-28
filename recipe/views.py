@@ -45,7 +45,8 @@ class RecipeListView(ListAPIView):
     search_fields = [
         'title',
         'category__name',
-        'user__firebase_id'
+        'user__firebase_id',
+        'ingredients'
     ]
 
 
@@ -58,7 +59,8 @@ def add_recipe(request):
         desc = request.data['desc']
         category_txt = request.data['category']
         difficulty_txt = request.data['difficulty']
-        ingredient_list = request.data['ingredients']
+        # ingredient_list = request.data['ingredients']
+        ingredients = request.data['ingredients']
         image_url = request.data['image_url']
         time = request.data['time']
         serving = request.data['serving']
@@ -77,31 +79,30 @@ def add_recipe(request):
         difficulty = Difficulty.objects.get(name=difficulty_txt)
     except Category.DoesNotExist:
         return JsonResponse({"success": False, "message": DIFFICULTY_NOT_FOUND_TEXT})
-    try:
+    # try:
 
-        ingredient_obj_list = []
-        for ingredients in ingredient_list:
-            quantity, created = Quantity.objects.get_or_create(name=ingredients["quantity"]["name"],
-                                                               amount=ingredients["quantity"]["amount"])
-            ingredient, created = Ingredient.objects.get_or_create(name=ingredients["name"], quantity=quantity)
-            ingredient_obj_list.append(ingredient)
-    except Ingredient.DoesNotExist:
-        return JsonResponse({"success": False, "message": INGREDIENT_NOT_FOUND_TEXT})
+    # ingredient_obj_list = []
+    # for ingredients in ingredient_list:
+    #     quantity, created = Quantity.objects.get_or_create(name=ingredients["quantity"]["name"],
+    #                                                        amount=ingredients["quantity"]["amount"])
+    #     ingredient, created = Ingredient.objects.get_or_create(name=ingredients["name"], quantity=quantity)
+    #     ingredient_obj_list.append(ingredient)
+    # except Ingredient.DoesNotExist:
+    #     return JsonResponse({"success": False, "message": INGREDIENT_NOT_FOUND_TEXT})
 
-    recipe = Recipe()
-    recipe.user = user
-    recipe.difficulty = difficulty
-    recipe.desc = desc
-    recipe.image_url = image_url
-    recipe.serving = serving
-    recipe.time = time
-    recipe.title = title
+    recipe = Recipe(user=user, difficulty=difficulty,
+                    desc=desc, image_url=image_url,
+                    serving=serving,
+                    time=time,
+                    title=title,
+                    ingredients=ingredients
+                    )
     recipe.save()
     recipe.category.add(category)
-    recipe.ingredients.set(ingredient_obj_list)
+    # recipe.ingredients.set(ingredient_obj_list)
 
     serialized_obj = RecipeSerializer(recipe)
-    return JsonResponse({"success": True, "data": serialized_obj.data})
+    return JsonResponse(serialized_obj.data)
 
 
 @api_view(['POST'])
@@ -146,7 +147,7 @@ def get_recipes_by_user(request):
         firebase_id = request.data.get("firebase_id")
         recipes = Recipe.objects.filter(user__firebase_id=firebase_id)
         serialized_obj = RecipeSerializer(recipes, many=True)
-        return JsonResponse(serialized_obj.data,safe=False)
+        return JsonResponse(serialized_obj.data, safe=False)
     except IndexError:
         return JsonResponse({"success": False, "message": MISSING_PARAMS})
     except Recipe.DoesNotExist:

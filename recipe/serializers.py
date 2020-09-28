@@ -32,7 +32,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     user=BitarifUserSerializer()
     category=CategorySerializer(many=True)
     difficulty=DifficultySerializer()
-    ingredients=IngredientSerializer(many=True)
 
     class Meta:
         model=Recipe
