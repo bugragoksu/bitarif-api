@@ -20,13 +20,13 @@ class BitarifUserCreateView(CreateAPIView):
     serializer_class = BitarifUserCreateSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer=self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        data=serializer.data
+        data = serializer.data
         token = helper.generate_access_token(data["firebase_id"])
-        data.update({"token":token})
-        return Response(data,status=HTTPStatus.CREATED)
+        data.update({"token": token})
+        return Response(data, status=HTTPStatus.CREATED)
 
 
 @permission_classes([AllowAny])
@@ -50,7 +50,7 @@ def login_view(request):
 
     token = helper.generate_access_token(user.firebase_id)
     serialized_obj = BitarifUserSerializer(user)
-    data=serialized_obj.data
+    data = serialized_obj.data
     data.update({'token': token})
     return JsonResponse(data)
 
@@ -75,3 +75,17 @@ def add_user_follower(request):
         return JsonResponse({"success": True, "message": SUCCESSFUL_TEXT})
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)})
+
+
+@csrf_exempt
+@api_view(['POST'])
+def get_follows_by_user(request):
+    try:
+        firebase_id = request.data.get("firebase_id")
+        follows = BitarifUser.objects.filter(follower__firebase_id=firebase_id)
+        serialized_obj = FollowerSerializer(follows, many=True)
+        return JsonResponse(serialized_obj.data, safe=False)
+    except IndexError:
+        return JsonResponse({"success": False, "message": MISSING_PARAMS})
+    except BitarifUser.DoesNotExist:
+        return JsonResponse({"success": False, "message": USER_NOT_FOUND_TEXT})

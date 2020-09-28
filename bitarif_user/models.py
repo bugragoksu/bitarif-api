@@ -7,7 +7,7 @@ from django.db import models
 class BitarifUser(models.Model):
     firebase_id = models.CharField(max_length=400, unique=True)
     email = models.EmailField(('Email Adress'), unique=True)
-    password = models.CharField(max_length=500)
+    password = models.CharField(max_length=1000)
     name = models.CharField(max_length=100, blank=True, null=True, default='bitarif User')
     profile_pic = models.CharField(max_length=500, default="https://www.tenforums.com/geek/gars/images/2/types/thumb_15951118880user.png")
     created_date = models.DateTimeField(auto_now_add=True)

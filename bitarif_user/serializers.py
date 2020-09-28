@@ -5,7 +5,7 @@ from rest_framework import serializers
 class FollowerSerializer(serializers.ModelSerializer):
     class Meta:
         model = BitarifUser
-        fields = ('firebase_id',)
+        fields = ('firebase_id','profile_pic',)
 
 
 class BitarifUserSerializer(serializers.ModelSerializer):
